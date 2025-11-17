@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="アフィリエイト商品URL管理ツール">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>アフィリエイト商品管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 10px;
+        color: #333;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .header h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .header p {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .tabs {
+        display: flex;
+        background: #f8f9fa;
+        border-bottom: 2px solid #e0e0e0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tab {
+        flex: 1;
+        min-width: 100px;
+        padding: 15px 10px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: #666;
+        transition: all 0.3s;
+        white-space: nowrap;
+    }
+
+    .tab.active {
+        color: #667eea;
+        background: white;
+        border-bottom: 3px solid #667eea;
+    }
+
+    .tab-content {
+        display: none;
+        padding: 20px;
+        animation: fadeIn 0.3s;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+        font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    @media (max-width: 600px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin: 5px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-info {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .btn-warning {
+        background: #ffc107;
+        color: #333;
+    }
+
+    .btn-small {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .filter-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .filter-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .product-list {
+        display: grid;
+        gap: 15px;
+    }
+
+    .product-card {
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 15px;
+        transition: all 0.3s;
+    }
+
+    .product-card:hover {
+        border-color: #667eea;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .product-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 10px;
+    }
+
+    .product-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        flex: 1;
+    }
+
+    .product-badges {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .badge-site {
+        background: #667eea;
+        color: white;
+    }
+
+    .badge-genre {
+        background: #28a745;
+        color: white;
+    }
+
+    .badge-price {
+        background: #ffc107;
+        color: #333;
+    }
+
+    .badge-status {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .badge-priority {
+        background: #dc3545;
+        color: white;
+    }
+
+    .product-info {
+        margin: 10px 0;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .product-info p {
+        margin: 5px 0;
+    }
+
+    .product-links {
+        display: flex;
+        gap: 5px;
+        margin: 10px 0;
+        flex-wrap: wrap;
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 5px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .alert {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .alert-warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+
+    .alert-info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+
+    .tag-input-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        padding: 8px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        min-height: 45px;
+    }
+
+    .tag-item {
+        background: #667eea;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .tag-remove {
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .tag-input-field {
+        border: none;
+        outline: none;
+        flex: 1;
+        min-width: 100px;
+        padding: 4px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+    .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .modal.active {
+        display: flex;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        max-width: 600px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .modal-close {
+        font-size: 24px;
+        cursor: pointer;
+        color: #999;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .copy-button {
+        position: relative;
+    }
+
+    .copy-tooltip {
+        position: absolute;
+        background: #333;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-bottom: 5px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+    }
+
+    .copy-button.copied .copy-tooltip {
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        .header h1 {
+            font-size: 20px;
+        }
+        
+        .tabs {
+            font-size: 12px;
+        }
+        
+        .tab {
+            padding: 12px 8px;
+            min-width: 80px;
+        }
+        
+        .product-actions,
+        .product-links {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 アフィリエイト商品管理</h1>
+            <p>商品URLをストックして効率的に管理</p>
+        </div>
+
+```
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('dashboard')">ダッシュボード</button>
+        <button class="tab" onclick="switchTab('register')">商品登録</button>
+        <button class="tab" onclick="switchTab('list')">商品一覧</button>
+        <button class="tab" onclick="switchTab('data')">データ管理</button>
+    </div>
+
+    <!-- ダッシュボード -->
+    <div id="dashboard" class="tab-content active">
+        <h2 style="margin-bottom: 20px;">📈 統計情報</h2>
+        <div class="stats-grid" id="statsGrid"></div>
+        
+        <h3 style="margin: 30px 0 15px 0;">📋 最近登録した商品</h3>
+        <div id="recentProducts"></div>
+    </div>
+
+    <!-- 商品登録 -->
+    <div id="register" class="tab-content">
+        <h2 style="margin-bottom: 20px;">➕ 新規商品登録</h2>
+        <div id="registerAlert"></div>
+        
+        <form id="productForm">
+            <div class="form-group">
+                <label>商品名 <span style="color: red;">*</span></label>
+                <input type="text" id="productName" required placeholder="商品名を入力">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>サイト <span style="color: red;">*</span></label>
+                    <select id="site" required>
+                        <option value="">選択してください</option>
+                        <option value="Amazon">Amazon</option>
+                        <option value="楽天">楽天</option>
+                        <option value="Yahoo!">Yahoo!ショッピング</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>ジャンル <span style="color: red;">*</span></label>
+                    <select id="genre" required>
+                        <option value="">選択してください</option>
+                        <option value="日用品">日用品</option>
+                        <option value="便利グッズ">便利グッズ</option>
+                        <option value="家電">家電</option>
+                        <option value="ファッション">ファッション</option>
+                        <option value="食品">食品</option>
+                        <option value="美容・健康">美容・健康</option>
+                        <option value="スポーツ">スポーツ</option>
+                        <option value="ホビー">ホビー</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>商品URL <span style="color: red;">*</span></label>
+                <input type="url" id="productUrl" required placeholder="https://...">
+            </div>
+
+            <div class="form-group">
+                <label>アフィリエイトリンク</label>
+                <input type="url" id="affiliateUrl" placeholder="https://...">
+            </div>
+
+            <div class="form-group">
+                <label>商品画像URL</label>
+                <input type="url" id="imageUrl" placeholder="https://...">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>価格帯（最小）</label>
+                    <select id="priceMin">
+                        <option value="">選択してください</option>
+                        <option value="0">0円</option>
+                        <option value="1000">1,000円</option>
+                        <option value="2000">2,000円</option>
+                        <option value="3000">3,000円</option>
+                        <option value="5000">5,000円</option>
+                        <option value="10000">10,000円</option>
+                        <option value="20000">20,000円</option>
+                        <option value="30000">30,000円</option>
+                        <option value="50000">50,000円</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>価格帯（最大）</label>
+                    <select id="priceMax">
+                        <option value="">選択してください</option>
+                        <option value="1000">1,000円</option>
+                        <option value="2000">2,000円</option>
+                        <option value="3000">3,000円</option>
+                        <option value="5000">5,000円</option>
+                        <option value="10000">10,000円</option>
+                        <option value="20000">20,000円</option>
+                        <option value="30000">30,000円</option>
+                        <option value="50000">50,000円</option>
+                        <option value="100000">100,000円</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>報酬率（%）</label>
+                    <input type="number" id="commissionRate" min="0" max="100" step="0.1" placeholder="例: 5.0">
+                </div>
+
+                <div class="form-group">
+                    <label>想定報酬額（円）</label>
+                    <input type="number" id="expectedReward" min="0" step="1" placeholder="例: 500">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ステータス</label>
+                    <select id="status">
+                        <option value="未投稿">未投稿</option>
+                        <option value="投稿済み">投稿済み</option>
+                        <option value="下書き">下書き</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>優先度</label>
+                    <select id="priority">
+                        <option value="中">中</option>
+                        <option value="高">高</option>
+                        <option value="低">低</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>お気に入り</label>
+                <input type="checkbox" id="favorite" style="width: auto;">
+            </div>
+
+            <div class="form-group">
+                <label>タグ（Enterで追加）</label>
+                <div class="tag-input-container" id="tagContainer">
+                    <input type="text" class="tag-input-field" id="tagInput" placeholder="タグを入力してEnter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>商品説明・メモ</label>
+                <textarea id="description" placeholder="商品の説明やメモを入力"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>レビュー・口コミメモ</label>
+                <textarea id="reviewMemo" placeholder="レビューや口コミのメモ"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Instagram投稿日</label>
+                <input type="date" id="postDate">
+            </div>
+
+            <div class="form-group">
+                <label>投稿キャプション</label>
+                <textarea id="caption" placeholder="Instagram投稿用のキャプション"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>ハッシュタグ</label>
+                <textarea id="hashtags" placeholder="#example #affiliate"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>パフォーマンスメモ</label>
+                <textarea id="performanceMemo" placeholder="クリック数、成約数などのメモ"></textarea>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button type="submit" class="btn btn-primary">💾 商品を登録</button>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">🔄 リセット</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 商品一覧 -->
+    <div id="list" class="tab-content">
+        <h2 style="margin-bottom: 20px;">📋 商品一覧</h2>
+        
+        <div class="filter-section">
+            <h3 style="margin-bottom: 15px;">🔍 フィルター・検索</h3>
+            <div class="filter-row">
+                <input type="text" id="searchKeyword" placeholder="🔍 キーワード検索" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                
+                <select id="filterSite" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <option value="">全サイト</option>
+                    <option value="Amazon">Amazon</option>
+                    <option value="楽天">楽天</option>
+                    <option value="Yahoo!">Yahoo!</option>
+                    <option value="その他">その他</option>
+                </select>
+
+                <select id="filterGenre" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <option value="">全ジャンル</option>
+                    <option value="日用品">日用品</option>
+                    <option value="便利グッズ">便利グッズ</option>
+                    <option value="家電">家電</option>
+                    <option value="ファッション">ファッション</option>
+                    <option value="食品">食品</option>
+                    <option value="美容・健康">美容・健康</option>
+                    <option value="スポーツ">スポーツ</option>
+                    <option value="ホビー">ホビー</option>
+                    <option value="その他">その他</option>
+                </select>
+
+                <select id="filterStatus" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <option value="">全ステータス</option>
+                    <option value="未投稿">未投稿</option>
+                    <option value="投稿済み">投稿済み</option>
+                    <option value="下書き">下書き</option>
+                </select>
+
+                <select id="filterPriority" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <option value="">全優先度</option>
+                    <option value="高">高</option>
+                    <option value="中">中</option>
+                    <option value="低">低</option>
+                </select>
+            </div>
+
+            <div class="filter-row" style="margin-top: 10px;">
+                <select id="filterPriceRange" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <option value="">全価格帯</option>
+                    <option value="0-1000">0〜1,000円</option>
+                    <option value="1000-3000">1,000〜3,000円</option>
+                    <option value="3000-5000">3,000〜5,000円</option>
+                    <option value="5000-10000">5,000〜10,000円</option>
+                    <option value="10000-20000">10,000〜20,000円</option>
+                    <option value="20000-50000">20,000〜50,000円</option>
+                    <option value="50000-999999">50,000円〜</option>
+                </select>
+
+                <select id="sortBy" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <option value="newest">新しい順</option>
+                    <option value="oldest">古い順</option>
+                    <option value="priceHigh">価格が高い順</option>
+                    <option value="priceLow">価格が安い順</option>
+                    <option value="priority">優先度順</option>
+                </select>
+
+                <label style="display: flex; align-items: center; padding: 10px;">
+                    <input type="checkbox" id="filterFavorite" style="width: auto; margin-right: 8px;">
+                    お気に入りのみ
+                </label>
+            </div>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <button class="btn btn-primary" onclick="applyFilters()">🔍 検索</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">🔄 クリア</button>
+            </div>
+        </div>
+
+        <div id="productCount" style="margin-bottom: 10px; color: #666;"></div>
+        <div class="product-list" id="productList"></div>
+    </div>
+
+    <!-- データ管理 -->
+    <div id="data" class="tab-content">
+        <h2 style="margin-bottom: 20px;">💾 データ管理</h2>
+        
+        <div class="alert alert-info">
+            データはブラウザのLocalStorageに保存されます。ブラウザのデータを削除すると消えるため、定期的にエクスポートしてバックアップしてください。
+        </div>
+
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 15px;">📤 エクスポート</h3>
+            <p style="margin-bottom: 15px; color: #666;">登録済みの商品データをJSONファイルとしてダウンロードします。</p>
+            <button class="btn btn-success" onclick="exportData()">📥 データをエクスポート</button>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 15px;">📥 インポート</h3>
+            <p style="margin-bottom: 15px; color: #666;">以前エクスポートしたJSONファイルを読み込みます。</p>
+            <div class="alert alert-warning">
+                ⚠️ インポートすると現在のデータは上書きされます。事前にエクスポートしてバックアップすることをお勧めします。
+            </div>
+            <input type="file" id="importFile" accept=".json" style="margin-bottom: 10px;">
+            <button class="btn btn-info" onclick="importData()">📤 データをインポート</button>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <h3 style="margin-bottom: 15px;">🗑️ データ削除</h3>
+            <p style="margin-bottom: 15px; color: #666;">全ての商品データを削除します。この操作は取り消せません。</p>
+            <button class="btn btn-danger" onclick="confirmDeleteAll()">🗑️ 全データを削除</button>
+        </div>
+
+        <div id="dataAlert" style="margin-top: 20px;"></div>
+    </div>
+</div>
+
+<!-- 編集モーダル -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>✏️ 商品編集</h3>
+            <span class="modal-close" onclick="closeEditModal()">&times;</span>
+        </div>
+        <div id="editForm"></div>
+    </div>
+</div>
+
+<script>
+    // グローバル変数
+    let products = [];
+    let currentEditId = null;
+    let tags = [];
+
+    // 初期化
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProducts();
+        updateDashboard();
+        displayProducts();
+        setupTagInput();
+        setupFormValidation();
+    });
+
+    // タブ切り替え
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        event.target.classList.add('active');
+        document.getElementById(tabName).classList.add('active');
+
+        if (tabName === 'list') {
+            applyFilters();
+        } else if (tabName === 'dashboard') {
+            updateDashboard();
+        }
+    }
+
+    // LocalStorageからデータ読み込み
+    function loadProducts() {
+        try {
+            const stored = localStorage.getItem('affiliateProducts');
+            if (stored) {
+                products = JSON.parse(stored);
+                // データ検証
+                products = products.filter(p => p && p.id && p.productName);
+            }
+        } catch (error) {
+            console.error('データ読み込みエラー:', error);
+            showAlert('registerAlert', 'データの読み込みに失敗しました。', 'danger');
+            products = [];
+        }
+    }
+
+    // LocalStorageにデータ保存
+    function saveProducts() {
+        try {
+            localStorage.setItem('affiliateProducts', JSON.stringify(products));
+            return true;
+        } catch (error) {
+            console.error('データ保存エラー:', error);
+            if (error.name === 'QuotaExceededError') {
+                showAlert('registerAlert', 'ストレージ容量が不足しています。古いデータを削除してください。', 'danger');
+            } else {
+                showAlert('registerAlert', 'データの保存に失敗しました。', 'danger');
+            }
+            return false;
+        }
+    }
+
+    // タグ入力の設定
+    function setupTagInput() {
+        const tagInput = document.getElementById('tagInput');
+        const tagContainer = document.getElementById('tagContainer');
+
+        tagInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const value = tagInput.value.trim();
+                if (value && !tags.includes(value)) {
+                    tags.push(value);
+                    renderTags();
+                    tagInput.value = '';
+                }
+            }
+        });
+    }
+
+    // タグ表示
+    function renderTags() {
+        const tagContainer = document.getElementById('tagContainer');
+        const tagInput = document.getElementById('tagInput');
+        
+        // 既存のタグを削除（入力フィールドは保持）
+        const existingTags = tagContainer.querySelectorAll('.tag-item');
+        existingTags.forEach(tag => tag.remove());
+
+        // タグを追加
+        tags.forEach((tag, index) => {
+            const tagElement = document.createElement('div');
+            tagElement.className = 'tag-item';
+            tagElement.innerHTML = `
+                ${tag}
+                <span class="tag-remove" onclick="removeTag(${index})">×</span>
+            `;
+            tagContainer.insertBefore(tagElement, tagInput);
+        });
+    }
+
+    // タグ削除
+    function removeTag(index) {
+        tags.splice(index, 1);
+        renderTags();
+    }
+
+    // フォームバリデーション
+    function setupFormValidation() {
+        const form = document.getElementById('productForm');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 必須項目チェック
+            const productName = document.getElementById('productName').value.trim();
+            const site = document.getElementById('site').value;
+            const genre = document.getElementById('genre').value;
+            const productUrl = document.getElementById('productUrl').value.trim();
+
+            if (!productName || !site || !genre || !productUrl) {
+                showAlert('registerAlert', '必須項目を全て入力してください。', 'danger');
+                return;
+            }
+
+            // URL形式チェック
+            if (!isValidUrl(productUrl)) {
+                showAlert('registerAlert', '商品URLの形式が正しくありません。', 'danger');
+                return;
+            }
+
+            const affiliateUrl = document.getElementById('affiliateUrl').value.trim();
+            if (affiliateUrl && !isValidUrl(affiliateUrl)) {
+                showAlert('registerAlert', 'アフィリエイトリンクの形式が正しくありません。', 'danger');
+                return;
+            }
+
+            const imageUrl = document.getElementById('imageUrl').value.trim();
+            if (imageUrl && !isValidUrl(imageUrl)) {
+                showAlert('registerAlert', '商品画像URLの形式が正しくありません。', 'danger');
+                return;
+            }
+
+            // 価格帯チェック
+            const priceMin = parseInt(document.getElementById('priceMin').value) || 0;
+            const priceMax = parseInt(document.getElementById('priceMax').value) || 999999;
+            
+            if (priceMin > priceMax) {
+                showAlert('registerAlert', '価格帯の最小値が最大値より大きくなっています。', 'danger');
+                return;
+            }
+
+            // 商品登録
+            registerProduct();
+        });
+    }
+
+    // URL形式チェック
+    function isValidUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    // 商品登録
+    function registerProduct() {
+        const product = {
+            id: Date.now(),
+            productName: document.getElementById('productName').value.trim(),
+            site: document.getElementById('site').value,
+            genre: document.getElementById('genre').value,
+            productUrl: document.getElementById('productUrl').value.trim(),
+            affiliateUrl: document.getElementById('affiliateUrl').value.trim(),
+            imageUrl: document.getElementById('imageUrl').value.trim(),
+            priceMin: parseInt(document.getElementById('priceMin').value) || 0,
+            priceMax: parseInt(document.getElementById('priceMax').value) || 999999,
+            commissionRate: parseFloat(document.getElementById('commissionRate').value) || 0,
+            expectedReward: parseInt(document.getElementById('expectedReward').value) || 0,
+            status: document.getElementById('status').value,
+            priority: document.getElementById('priority').value,
+            favorite: document.getElementById('favorite').checked,
+            tags: [...tags],
+            description: document.getElementById('description').value.trim(),
+            reviewMemo: document.getElementById('reviewMemo').value.trim(),
+            postDate: document.getElementById('postDate').value,
+            caption: document.getElementById('caption').value.trim(),
+            hashtags: document.getElementById('hashtags').value.trim(),
+            performanceMemo: document.getElementById('performanceMemo').value.trim(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        products.push(product);
+        
+        if (saveProducts()) {
+            showAlert('registerAlert', '✅ 商品を登録しました！', 'success');
+            resetForm();
+            updateDashboard();
+            
+            // 一覧タブに切り替え
+            setTimeout(() => {
+                switchTab('list');
+            }, 1500);
+        }
+    }
+
+    // フォームリセット
+    function resetForm() {
+        document.getElementById('productForm').reset();
+        tags = [];
+        renderTags();
+    }
+
+    // アラート表示
+    function showAlert(containerId, message, type) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        
+        setTimeout(() => {
+            container.innerHTML = '';
+        }, 5000);
+    }
+
+    // ダッシュボード更新
+    function updateDashboard() {
+        const statsGrid = document.getElementById('statsGrid');
+        const recentProducts = document.getElementById('recentProducts');
+
+        // 統計計算
+        const totalProducts = products.length;
+        const postedProducts = products.filter(p => p.status === '投稿済み').length;
+        const favorites = products.filter(p => p.favorite).length;
+        const totalExpectedReward = products.reduce((sum, p) => sum + (p.expectedReward || 0), 0);
+
+        // 統計表示
+        statsGrid.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-number">${totalProducts}</div>
+                <div class="stat-label">総商品数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${postedProducts}</div>
+                <div class="stat-label">投稿済み</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${favorites}</div>
+                <div class="stat-label">お気に入り</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">¥${totalExpectedReward.toLocaleString()}</div>
+                <div class="stat-label">想定報酬合計</div>
+            </div>
+        `;
+
+        // 最近の商品
+        const recent = [...products]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 5);
+
+        if (recent.length === 0) {
+            recentProducts.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📦</div><p>まだ商品が登録されていません</p></div>';
+        } else {
+            recentProducts.innerHTML = recent.map(p => createProductCard(p)).join('');
+        }
+    }
+
+    // 商品カード作成
+    function createProductCard(product) {
+        const priceRange = product.priceMin || product.priceMax 
+            ? `${product.priceMin ? product.priceMin.toLocaleString() : '0'}円〜${product.priceMax ? product.priceMax.toLocaleString() : ''}円`
+            : '価格未設定';
+
+        return `
+            <div class="product-card">
+                <div class="product-header">
+                    <div class="product-title">${escapeHtml(product.productName)}</div>
+                    ${product.favorite ? '<span style="font-size: 20px;">⭐</span>' : ''}
+                </div>
+                
+                <div class="product-badges">
+                    <span class="badge badge-site">${escapeHtml(product.site)}</span>
+                    <span class="badge badge-genre">${escapeHtml(product.genre)}</span>
+                    <span class="badge badge-price">${priceRange}</span>
+                    <span class="badge badge-status">${escapeHtml(product.status)}</span>
+                    ${product.priority === '高' ? '<span class="badge badge-priority">優先度: 高</span>' : ''}
+                </div>
+
+                ${product.tags && product.tags.length > 0 ? `
+                    <div class="product-badges">
+                        ${product.tags.map(tag => `<span class="badge" style="background: #6c757d; color: white;">#${escapeHtml(tag)}</span>`).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="product-info">
+                    ${product.description ? `<p>📝 ${escapeHtml(product.description)}</p>` : ''}
+                    ${product.commissionRate ? `<p>💰 報酬率: ${product.commissionRate}% / 想定報酬: ¥${(product.expectedReward || 0).toLocaleString()}</p>` : ''}
+                    ${product.postDate ? `<p>📅 投稿日: ${product.postDate}</p>` : ''}
+                    <p style="color: #999; font-size: 12px;">登録日: ${new Date(product.createdAt).toLocaleDateString()}</p>
+                </div>
+
+                <div class="product-links">
+                    <button class="btn btn-info btn-small copy-button" onclick="copyToClipboard('${escapeHtml(product.productUrl)}', this)">
+                        📋 商品URL
+                        <span class="copy-tooltip">コピーしました！</span>
+                    </button>
+                    ${product.affiliateUrl ? `
+                        <button class="btn btn-success btn-small copy-button" onclick="copyToClipboard('${escapeHtml(product.affiliateUrl)}', this)">
+                            🔗 アフィリURL
+                            <span class="copy-tooltip">コピーしました！</span>
+                        </button>
+                    ` : ''}
+                </div>
+
+                <div class="product-actions">
+                    <button class="btn btn-primary btn-small" onclick="editProduct(${product.id})">✏️ 編集</button>
+                    <button class="btn btn-danger btn-small" onclick="deleteProduct(${product.id})">🗑️ 削除</button>
+                    <button class="btn btn-secondary btn-small" onclick="toggleFavorite(${product.id})">
+                        ${product.favorite ? '⭐ 解除' : '☆ お気に入り'}
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // HTMLエスケープ
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // クリップボードにコピー
+    function copyToClipboard(text, button) {
+        navigator.clipboard.writeText(text).then(() => {
+            button.classList.add('copied');
+            setTimeout(() => {
+                button.classList.remove('copied');
+            }, 2000);
+        }).catch(err => {
+            console.error('コピー失敗:', err);
+            alert('コピーに失敗しました');
+        });
+    }
+
+    // お気に入りトグル
+    function toggleFavorite(id) {
+        const product = products.find(p => p.id === id);
+        if (product) {
+            product.favorite = !product.favorite;
+            product.updatedAt = new Date().toISOString();
+            saveProducts();
+            applyFilters();
+            updateDashboard();
+        }
+    }
+
+    // 商品編集
+    function editProduct(id) {
+        const product = products.find(p => p.id === id);
+        if (!product) return;
+
+        currentEditId = id;
+        tags = [...(product.tags || [])];
+
+        const modal = document.getElementById('editModal');
+        const editForm = document.getElementById('editForm');
+
+        editForm.innerHTML = `
+            <form id="editProductForm">
+                <div class="form-group">
+                    <label>商品名 <span style="color: red;">*</span></label>
+                    <input type="text" id="edit_productName" value="${escapeHtml(product.productName)}" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>サイト</label>
+                        <select id="edit_site">
+                            <option value="Amazon" ${product.site === 'Amazon' ? 'selected' : ''}>Amazon</option>
+                            <option value="楽天" ${product.site === '楽天' ? 'selected' : ''}>楽天</option>
+                            <option value="Yahoo!" ${product.site === 'Yahoo!' ? 'selected' : ''}>Yahoo!</option>
+                            <option value="その他" ${product.site === 'その他' ? 'selected' : ''}>その他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ジャンル</label>
+                        <select id="edit_genre">
+                            <option value="日用品" ${product.genre === '日用品' ? 'selected' : ''}>日用品</option>
+                            <option value="便利グッズ" ${product.genre === '便利グッズ' ? 'selected' : ''}>便利グッズ</option>
+                            <option value="家電" ${product.genre === '家電' ? 'selected' : ''}>家電</option>
+                            <option value="ファッション" ${product.genre === 'ファッション' ? 'selected' : ''}>ファッション</option>
+                            <option value="食品" ${product.genre === '食品' ? 'selected' : ''}>食品</option>
+                            <option value="美容・健康" ${product.genre === '美容・健康' ? 'selected' : ''}>美容・健康</option>
+                            <option value="スポーツ" ${product.genre === 'スポーツ' ? 'selected' : ''}>スポーツ</option>
+                            <option value="ホビー" ${product.genre === 'ホビー' ? 'selected' : ''}>ホビー</option>
+                            <option value="その他" ${product.genre === 'その他' ? 'selected' : ''}>その他</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>商品URL</label>
+                    <input type="url" id="edit_productUrl" value="${escapeHtml(product.productUrl)}">
+                </div>
+
+                <div class="form-group">
+                    <label>アフィリエイトリンク</label>
+                    <input type="url" id="edit_affiliateUrl" value="${escapeHtml(product.affiliateUrl || '')}">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>価格帯（最小）</label>
+                        <input type="number" id="edit_priceMin" value="${product.priceMin || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>価格帯（最大）</label>
+                        <input type="number" id="edit_priceMax" value="${product.priceMax || ''}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ステータス</label>
+                        <select id="edit_status">
+                            <option value="未投稿" ${product.status === '未投稿' ? 'selected' : ''}>未投稿</option>
+                            <option value="投稿済み" ${product.status === '投稿済み' ? 'selected' : ''}>投稿済み</option>
+                            <option value="下書き" ${product.status === '下書き' ? 'selected' : ''}>下書き</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>優先度</label>
+                        <select id="edit_priority">
+                            <option value="高" ${product.priority === '高' ? 'selected' : ''}>高</option>
+                            <option value="中" ${product.priority === '中' ? 'selected' : ''}>中</option>
+                            <option value="低" ${product.priority === '低' ? 'selected' : ''}>低</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>タグ（Enterで追加）</label>
+                    <div class="tag-input-container" id="edit_tagContainer">
+                        <input type="text" class="tag-input-field" id="edit_tagInput" placeholder="タグを入力してEnter">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>商品説明・メモ</label>
+                    <textarea id="edit_description">${escapeHtml(product.description || '')}</textarea>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">💾 保存</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">キャンセル</button>
+                </div>
+            </form>
+        `;
+
+        // 編集用タグ入力設定
+        const editTagInput = document.getElementById('edit_tagInput');
+        renderEditTags();
+        
+        editTagInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const value = editTagInput.value.trim();
+                if (value && !tags.includes(value)) {
+                    tags.push(value);
+                    renderEditTags();
+                    editTagInput.value = '';
+                }
+            }
+        });
+
+        // フォーム送信
+        document.getElementById('editProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveEditedProduct();
+        });
+
+        modal.classList.add('active');
+    }
+
+    // 編集用タグ表示
+    function renderEditTags() {
+        const tagContainer = document.getElementById('edit_tagContainer');
+        const tagInput = document.getElementById('edit_tagInput');
+        
+        const existingTags = tagContainer.querySelectorAll('.tag-item');
+        existingTags.forEach(tag => tag.remove());
+
+        tags.forEach((tag, index) => {
+            const tagElement = document.createElement('div');
+            tagElement.className = 'tag-item';
+            tagElement.innerHTML = `
+                ${tag}
+                <span class="tag-remove" onclick="removeTag(${index}); renderEditTags();">×</span>
+            `;
+            tagContainer.insertBefore(tagElement, tagInput);
+        });
+    }
+
+    // 編集保存
+    function saveEditedProduct() {
+        const product = products.find(p => p.id === currentEditId);
+        if (!product) return;
+
+        const productUrl = document.getElementById('edit_productUrl').value.trim();
+        const affiliateUrl = document.getElementById('edit_affiliateUrl').value.trim();
+
+        if (productUrl && !isValidUrl(productUrl)) {
+            alert('商品URLの形式が正しくありません。');
+            return;
+        }
+
+        if (affiliateUrl && !isValidUrl(affiliateUrl)) {
+            alert('アフィリエイトリンクの形式が正しくありません。');
+            return;
+        }
+
+        product.productName = document.getElementById('edit_productName').value.trim();
+        product.site = document.getElementById('edit_site').value;
+        product.genre = document.getElementById('edit_genre').value;
+        product.productUrl = productUrl;
+        product.affiliateUrl = affiliateUrl;
+        product.priceMin = parseInt(document.getElementById('edit_priceMin').value) || 0;
+        product.priceMax = parseInt(document.getElementById('edit_priceMax').value) || 999999;
+        product.status = document.getElementById('edit_status').value;
+        product.priority = document.getElementById('edit_priority').value;
+        product.tags = [...tags];
+        product.description = document.getElementById('edit_description').value.trim();
+        product.updatedAt = new Date().toISOString();
+
+        if (saveProducts()) {
+            closeEditModal();
+            applyFilters();
+            updateDashboard();
+            alert('✅ 保存しました！');
+        }
+    }
+
+    // モーダルを閉じる
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('active');
+        currentEditId = null;
+        tags = [];
+    }
+
+    // 商品削除
+    function deleteProduct(id) {
+        if (!confirm('本当にこの商品を削除しますか？')) return;
+
+        products = products.filter(p => p.id !== id);
+        saveProducts();
+        applyFilters();
+        updateDashboard();
+    }
+
+    // フィルター適用
+    function applyFilters() {
+        const keyword = document.getElementById('searchKeyword').value.toLowerCase();
+        const site = document.getElementById('filterSite').value;
+        const genre = document.getElementById('filterGenre').value;
+        const status = document.getElementById('filterStatus').value;
+        const priority = document.getElementById('filterPriority').value;
+        const priceRange = document.getElementById('filterPriceRange').value;
+        const favoriteOnly = document.getElementById('filterFavorite').checked;
+        const sortBy = document.getElementById('sortBy').value;
+
+        let filtered = [...products];
+
+        // キーワード検索
+        if (keyword) {
+            filtered = filtered.filter(p => 
+                p.productName.toLowerCase().includes(keyword) ||
+                (p.description && p.description.toLowerCase().includes(keyword)) ||
+                (p.tags && p.tags.some(tag => tag.toLowerCase().includes(keyword)))
+            );
+        }
+
+        // サイトフィルター
+        if (site) {
+            filtered = filtered.filter(p => p.site === site);
+        }
+
+        // ジャンルフィルター
+        if (genre) {
+            filtered = filtered.filter(p => p.genre === genre);
+        }
+
+        // ステータスフィルター
+        if (status) {
+            filtered = filtered.filter(p => p.status === status);
+        }
+
+        // 優先度フィルター
+        if (priority) {
+            filtered = filtered.filter(p => p.priority === priority);
+        }
+
+        // 価格帯フィルター
+        if (priceRange) {
+            const [min, max] = priceRange.split('-').map(Number);
+            filtered = filtered.filter(p => {
+                const productMin = p.priceMin || 0;
+                const productMax = p.priceMax || 999999;
+                return productMin >= min && productMax <= max;
+            });
+        }
+
+        // お気に入りフィルター
+        if (favoriteOnly) {
+            filtered = filtered.filter(p => p.favorite);
+        }
+
+        // ソート
+        switch (sortBy) {
+            case 'newest':
+                filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                break;
+            case 'oldest':
+                filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                break;
+            case 'priceHigh':
+                filtered.sort((a, b) => (b.priceMax || 0) - (a.priceMax || 0));
+                break;
+            case 'priceLow':
+                filtered.sort((a, b) => (a.priceMin || 0) - (b.priceMin || 0));
+                break;
+            case 'priority':
+                const priorityOrder = { '高': 3, '中': 2, '低': 1 };
+                filtered.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]);
+                break;
+        }
+
+        displayProducts(filtered);
+    }
+
+    // 商品一覧表示
+    function displayProducts(filteredProducts = null) {
+        const productList = document.getElementById('productList');
+        const productCount = document.getElementById('productCount');
+        const displayProducts = filteredProducts || products;
+
+        productCount.textContent = `${displayProducts.length}件の商品`;
+
+        if (displayProducts.length === 0) {
+            productList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><p>商品が見つかりませんでした</p></div>';
+        } else {
+            productList.innerHTML = displayProducts.map(p => createProductCard(p)).join('');
+        }
+    }
+
+    // フィルタークリア
+    function clearFilters() {
+        document.getElementById('searchKeyword').value = '';
+        document.getElementById('filterSite').value = '';
+        document.getElementById('filterGenre').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterPriority').value = '';
+        document.getElementById('filterPriceRange').value = '';
+        document.getElementById('filterFavorite').checked = false;
+        document.getElementById('sortBy').value = 'newest';
+        applyFilters();
+    }
+
+    // データエクスポート
+    function exportData() {
+        if (products.length === 0) {
+            showAlert('dataAlert', '⚠️ エクスポートするデータがありません。', 'warning');
+            return;
+        }
+
+        try {
+            const dataStr = JSON.stringify(products, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `affiliate-products-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showAlert('dataAlert', '✅ データをエクスポートしました！', 'success');
+        } catch (error) {
+            console.error('エクスポートエラー:', error);
+            showAlert('dataAlert', '❌ エクスポートに失敗しました。', 'danger');
+        }
+    }
+
+    // データインポート
+    function importData() {
+        const fileInput = document.getElementById('importFile');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            showAlert('dataAlert', '⚠️ ファイルを選択してください。', 'warning');
+            return;
+        }
+
+        if (!file.name.endsWith('.json')) {
+            showAlert('dataAlert', '❌ JSONファイルを選択してください。', 'danger');
+            return;
+        }
+
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                
+                // データ検証
+                if (!Array.isArray(importedData)) {
+                    throw new Error('無効なデータ形式です。');
+                }
+
+                // 各商品データの検証
+                const validData = importedData.filter(p => 
+                    p && p.id && p.productName && p.site && p.genre
+                );
+
+                if (validData.length === 0) {
+                    throw new Error('有効な商品データが見つかりませんでした。');
+                }
+
+                if (!confirm(`${validData.length}件の商品データをインポートします。現在のデータは上書きされますがよろしいですか？`)) {
+                    return;
+                }
+
+                products = validData;
+                
+                if (saveProducts()) {
+                    showAlert('dataAlert', `✅ ${validData.length}件の商品データをインポートしました！`, 'success');
+                    updateDashboard();
+                    applyFilters();
+                    fileInput.value = '';
+                }
+            } catch (error) {
+                console.error('インポートエラー:', error);
+                showAlert('dataAlert', `❌ インポートに失敗しました: ${error.message}`, 'danger');
+            }
+        };
+
+        reader.onerror = function() {
+            showAlert('dataAlert', '❌ ファイルの読み込みに失敗しました。', 'danger');
+        };
+
+        reader.readAsText(file);
+    }
+
+    // 全データ削除
+    function confirmDeleteAll() {
+        if (!confirm('本当に全てのデータを削除しますか？この操作は取り消せません。')) return;
+        if (!confirm('最終確認：全データを削除してよろしいですか？')) return;
+
+        products = [];
+        saveProducts();
+        updateDashboard();
+        displayProducts();
+        showAlert('dataAlert', '✅ 全てのデータを削除しました。', 'success');
+    }
+
+    // モーダル外クリックで閉じる
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+</script>
+```
+
+</body>
+</html>
